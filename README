@@ -1,0 +1,75 @@
+logsearch(1)                General Commands Manual               logsearch(1)
+
+NAME
+       logsearch - Search a log file for the first occurance of a value
+
+SYNOPSIS
+       logsearch [OPTIONS] <FILE>
+
+DESCRIPTION
+       logsearch  takes  a  log-formatted  file  (see  "Log format" below) and
+       searches for a particular message. If the target message is found,  the
+       byte-offset of that message within the log file is returned.
+
+       A  log  file  is  a  concatenated sequence of messages. In its simplest
+       invokation, logsearch allows the user to search for a  message  by  its
+       sequence number.
+
+       Messages  in a log file may also have one or more monotonically growing
+       integer fields associated with them. In this case, logsearch can search
+       for a message by the value of one of its fields.
+
+OPTIONS
+       -f, --field=<number>
+              Search  for  a message by the specified field. If this option is
+              omitted, the target will  be  taken  to  refer  to  a  message's
+              sequence number.
+
+       -t, --target=<value>
+              Search  for  a  message  which matches the specified value. This
+              value is either matches against a field, or the sequence numbers
+              of the messages. If no target is specified, we simply update the
+              index and exit.
+
+       --index-file=<path>
+              Where to cache the index. If this option is  not  specified,  an
+              index  file will be created next to the log file, named the same
+              way but including a ".idx" extension.
+
+       -v     Make logsearch more verbose. May be given multiple times.
+
+DISCUSSION
+   Log format
+       A log file is a concatenation of length-prefixed blobs. Message  fields
+       are  expected  immediately  follow  the length tag, although they don't
+       have to. The message format is as follows:
+
+           [length | field 0 | field 1 | ... | message data ]
+
+       The length, as well  as  all  of  the  fields,  are  big-endian  64-bit
+       unsigned  integers.  The  length tag specifies the length of the entire
+       message, including the 8 bytes taken by the length tag itself.
+
+       In order for a field to be searchable, the user  must  ensure  that  it
+       increases monotonically through the log file. Non-monotonic fields will
+       not be detected at search time - logsearch will simply return the  off‐
+       set of some message.
+
+   Index files
+       When  searching  a  log file, logsearch first creates an index which is
+       caches in a file. The name of the index file is the  same  as  the  log
+       file  being  searched, with a ".idx" extension added. These index files
+       are purely for speeding up future searches in the same log, and can  be
+       safely  deleted.   However, note that when a log file is very large and
+       not in the OS page cache, the existence of an  index  file  may  become
+       important for reasonable performance.
+
+   Changing log files
+       Blah append only blah
+
+EXAMPLES
+       Tailing a remote log file, starting at a particular message:
+
+           ssh logserver -- tail --bytes=+$(logsearch -t 1000) --follow
+
+                                                                  logsearch(1)
