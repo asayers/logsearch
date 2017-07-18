@@ -1,10 +1,12 @@
 [package]
-name = "indexer_thing"
-version = "0.1.0"
 authors = ["Alex Sayers <alex.sayers@gmail.com>"]
+name = "logsearch"
+version = "0.1.0"
 
 [dependencies]
 byteorder = "1.1"
+clap = "2.25"
+env_logger = "0.4"
 fs2 = "0.4"
 log = "0.3"
 memmap = "0.5"
