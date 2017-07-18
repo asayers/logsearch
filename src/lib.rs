@@ -4,7 +4,9 @@ extern crate fs2;
 extern crate memmap;
 
 mod offsets;
+mod search;
 mod types;
 
 pub use offsets::*;
+pub use search::*;
 pub use types::*;
